@@ -108,3 +108,144 @@ sudo apt install apt-transport-https ca-certificates
 - Her zaman GPG anahtarlarını doğrulayın
 
 Bu adımları takip ederek Debian sisteminize güvenli bir şekilde yeni repository'ler ekleyebilirsiniz.
+
+Debian terminalinde kopyalama ve yapıştırma işlemleri için size farklı yöntemleri açıklayacağım:
+
+1. Terminal İçinde Kopyalama-Yapıştırma:
+```bash
+# Kopyalama
+CTRL + SHIFT + C
+
+# Yapıştırma
+CTRL + SHIFT + V
+```
+
+2. Sağ Tık Menüsü:
+```bash
+# Fare sağ tıklama ile:
+Kopyala (Copy)
+Yapıştır (Paste)
+```
+
+3. Orta Fare Tuşu ile:
+```bash
+# Metni seçtikten sonra:
+Orta tuş (tekerlek) ile tıklayarak yapıştırma
+```
+
+4. Terminal Kısayolları:
+```bash
+# Metin seçimi:
+SHIFT + Sol/Sağ ok tuşları
+
+# Tüm metni seçme:
+CTRL + SHIFT + A
+
+# Kesme:
+CTRL + SHIFT + X
+```
+
+5. Screen Kullanıcıları İçin:
+```bash
+# Copy mode'a geçiş:
+CTRL + A + [
+
+# Seçimi başlatma:
+SPACE
+
+# Seçimi kopyalama:
+CTRL + A + ]
+```
+
+6. Tmux Kullanıcıları İçin:
+```bash
+# Copy mode'a geçiş:
+CTRL + B + [
+
+# Seçimi başlatma:
+SPACE
+
+# Seçimi kopyalama:
+ENTER
+
+# Yapıştırma:
+CTRL + B + ]
+```
+
+7. Terminal Buffer Kopyalama:
+```bash
+# Son çıktıyı kopyalama
+!$
+
+# Son komutun tamamını kopyalama
+!!
+```
+
+8. xclip Kullanımı:
+```bash
+# xclip kurulumu
+sudo apt install xclip
+
+# Dosya içeriğini panoya kopyalama
+cat dosya.txt | xclip -selection clipboard
+
+# Komut çıktısını panoya kopyalama
+pwd | xclip -selection clipboard
+```
+
+9. Terminal Yapılandırması:
+```bash
+# .bashrc veya .zshrc dosyasına eklenebilecek alias'lar:
+alias c='xclip -selection clipboard'
+alias v='xclip -selection clipboard -o'
+```
+
+10. Vim Kullanıcıları İçin:
+```bash
+# Vim içinde kopyalama-yapıştırma:
+# Visual mode'a geçiş
+v
+
+# Tüm satırı seçme
+V
+
+# Kopyalama
+y
+
+# Yapıştırma
+p
+```
+
+11. SSH Üzerinden Kopyalama:
+```bash
+# SSH oturumunda kopyalama-yapıştırma aktif etme
+ssh -X kullanici@sunucu
+```
+
+Önemli İpuçları:
+
+- Terminal emülatörünüzün ayarlarından kopyalama-yapıştırma davranışını özelleştirebilirsiniz
+- Bazı terminal emülatörleri otomatik kopyalama özelliğine sahiptir
+- UTF-8 karakter kodlaması sorunlarına dikkat edin
+- Güvenlik nedeniyle bazı terminaller yapıştırma işlemini onay gerektirebilir
+
+Güvenlik Notları:
+- Hassas bilgileri kopyalarken dikkatli olun
+- Pano içeriğini düzenli olarak temizleyin
+- Güvenilmeyen kaynaklardan yapıştırma yaparken dikkatli olun
+
+Terminal türüne göre ek özelleştirmeler:
+
+GNOME Terminal:
+```bash
+# Ayarlar menüsünden:
+Düzenle > Tercihler > Kısayollar
+```
+
+Konsole:
+```bash
+# Ayarlar menüsünden:
+Ayarlar > Kısayolları Yapılandır
+```
+
+Bu yöntemlerden size en uygun olanı kullanabilirsiniz. 
