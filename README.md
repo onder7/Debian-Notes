@@ -42,6 +42,8 @@ Debian install Notes..
    - Bağlantı Bilgileri / Connection Information
 
 5. LAMP install
+   
+6. OpenSSH install
 *****************************************************
    
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
@@ -676,3 +678,147 @@ Not / Note:
 - Güvenlik güncellemelerini düzenli takip edin
 - Yedekleme rutini oluşturun
 - Performans optimizasyonu yapın
+
+  SSH Server kurulumunu adım adım anlatıyorum:
+
+1. SSH Server Kurulumu / SSH Server Installation:
+```bash
+# Güncelleme
+sudo apt update
+sudo apt upgrade
+
+# OpenSSH Server kurulumu
+sudo apt install openssh-server
+```
+
+2. Servis Yönetimi / Service Management:
+```bash
+# Servisi başlatma
+sudo systemctl start ssh
+
+# Otomatik başlatma
+sudo systemctl enable ssh
+
+# Servis durumu kontrolü
+sudo systemctl status ssh
+```
+
+3. Temel Güvenlik Ayarları / Basic Security Settings:
+```bash
+# SSH yapılandırma dosyası
+sudo nano /etc/ssh/sshd_config
+
+# Önemli güvenlik ayarları:
+Port 2222                  # Varsayılan portu değiştir
+PermitRootLogin no        # Root girişini engelle
+PasswordAuthentication no  # Şifre ile girişi kapat
+PubkeyAuthentication yes  # Anahtar ile girişe izin ver
+AllowUsers kullanici1     # İzin verilen kullanıcılar
+MaxAuthTries 3            # Maksimum deneme sayısı
+```
+
+4. Firewall Ayarları / Firewall Settings:
+```bash
+# SSH portu için güvenlik duvarını yapılandırma
+sudo ufw allow 2222/tcp
+sudo ufw enable
+sudo ufw status
+```
+
+5. SSH Anahtar Yönetimi / SSH Key Management:
+```bash
+# Client tarafında anahtar oluşturma
+ssh-keygen -t rsa -b 4096
+
+# Açık anahtarı sunucuya kopyalama
+ssh-copy-id -p 2222 kullanici@sunucu_ip
+```
+
+6. SSH Bağlantı Test / SSH Connection Test:
+```bash
+# SSH bağlantı testi
+ssh -p 2222 kullanici@sunucu_ip
+```
+
+7. Log Kontrolü / Log Monitoring:
+```bash
+# SSH loglarını izleme
+sudo tail -f /var/log/auth.log
+```
+
+8. Fail2ban Kurulumu / Fail2ban Installation:
+```bash
+# Fail2ban kurulumu
+sudo apt install fail2ban
+
+# Yapılandırma
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.local
+```
+
+9. İzinler / Permissions:
+```bash
+# SSH dizini izinleri
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+```
+
+10. Güvenlik İpuçları / Security Tips:
+- Güçlü şifreler kullanın
+- Varsayılan portu değiştirin
+- Anahtar tabanlı kimlik doğrulama kullanın
+- Fail2ban kullanın
+- Logları düzenli kontrol edin
+
+11. Sorun Giderme / Troubleshooting:
+```bash
+# Bağlantı sorunları için debug modu
+ssh -vv kullanici@sunucu_ip
+
+# SSH servis durumu
+sudo systemctl status ssh
+
+# Port kontrolü
+sudo netstat -tulpn | grep ssh
+```
+
+12. SSH Config Örneği / SSH Config Example:
+```bash
+# ~/.ssh/config dosyası
+Host sunucu_adi
+    HostName sunucu_ip
+    Port 2222
+    User kullanici
+    IdentityFile ~/.ssh/id_rsa
+```
+
+13. Otomatik Bağlantı / Auto Connection:
+```bash
+# Anahtar oluşturma (parolasız)
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+
+# Anahtarı sunucuya kopyalama
+ssh-copy-id -i ~/.ssh/id_rsa.pub kullanici@sunucu_ip
+```
+
+Önemli Notlar / Important Notes:
+- Her değişiklikten sonra servisi yeniden başlatın
+- Güvenlik güncellemelerini düzenli yapın
+- Yedekleme rutini oluşturun
+- Sadece gerekli portları açık tutun
+- SSH anahtarlarını güvenli saklayın
+
+Yararlı Komutlar / Useful Commands:
+```bash
+# Bağlı kullanıcıları görme
+who
+
+# Aktif SSH oturumları
+w
+
+# SSH versiyonu kontrol
+ssh -V
+
+# SSH anahtar parmak izi
+ssh-keygen -l -f ~/.ssh/id_rsa.pub
+```
