@@ -41,6 +41,9 @@ Debian install Notes..
    - Güvenlik Önerileri / Security Recommendations
    - Bağlantı Bilgileri / Connection Information
 
+5. LAMP install
+*****************************************************
+   
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
 
 1. Sources.list Dosyası Üzerinden Ekleme:
@@ -521,3 +524,155 @@ sudo nano /etc/fail2ban/jail.local
 - Şifre / Password: Linux kullanıcı şifreniz / Your Linux password
 
 Windows'tan bağlanmak için "Uzak Masaüstü Bağlantısı" (Remote Desktop Connection) uygulamasını kullanabilirsiniz. / You can use Remote Desktop Connection application from Windows to connect.
+
+Debian'da LAMP (Linux, Apache, MySQL, PHP) stack kurulumunu adım adım anlatayım:
+
+1. Sistem Güncellemesi / System Update:
+```bash
+sudo apt update
+sudo apt upgrade -y
+```
+
+2. Apache Web Server Kurulumu / Apache Installation:
+```bash
+# Apache kurulumu
+sudo apt install apache2
+
+# Apache'yi başlatma
+sudo systemctl start apache2
+sudo systemctl enable apache2
+
+# Durumu kontrol
+sudo systemctl status apache2
+```
+
+3. MySQL (MariaDB) Kurulumu / MySQL Installation:
+```bash
+# MySQL kurulumu
+sudo apt install mariadb-server mariadb-client
+
+# MySQL'i başlatma
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+
+# Güvenlik yapılandırması
+sudo mysql_secure_installation
+```
+
+4. PHP Kurulumu / PHP Installation:
+```bash
+# PHP ve gerekli modüllerin kurulumu
+sudo apt install php php-mysql php-cli php-common php-mbstring php-gd php-curl php-xml php-zip
+
+# Apache PHP modülü
+sudo apt install libapache2-mod-php
+
+# Apache'yi yeniden başlatma
+sudo systemctl restart apache2
+```
+
+5. Test ve Doğrulama / Testing:
+```bash
+# PHP bilgi sayfası oluşturma
+sudo nano /var/www/html/info.php
+```
+
+PHP test dosyası içeriği:
+```php
+<?php
+phpinfo();
+?>
+```
+
+6. İzinler ve Güvenlik / Permissions:
+```bash
+# Web dizini izinleri
+sudo chown -R www-data:www-data /var/www/html/
+sudo chmod -R 755 /var/www/html/
+```
+
+7. Firewall Ayarları / Firewall Settings:
+```bash
+# HTTP ve HTTPS portlarını açma
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+sudo ufw reload
+```
+
+8. PhpMyAdmin Kurulumu (Opsiyonel) / PhpMyAdmin Installation:
+```bash
+# PhpMyAdmin kurulumu
+sudo apt install phpmyadmin
+
+# Apache yapılandırması
+sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+```
+
+Önemli Dizinler / Important Directories:
+```bash
+# Web root dizini
+/var/www/html/
+
+# Apache yapılandırma
+/etc/apache2/
+
+# PHP yapılandırma
+/etc/php/
+
+# MySQL yapılandırma
+/etc/mysql/
+```
+
+Temel Komutlar / Basic Commands:
+```bash
+# Apache yönetimi
+sudo systemctl start|stop|restart|status apache2
+
+# MySQL yönetimi
+sudo systemctl start|stop|restart|status mariadb
+
+# Apache hata logları
+sudo tail -f /var/log/apache2/error.log
+
+# PHP hata logları
+sudo tail -f /var/log/php_errors.log
+```
+
+Güvenlik Önerileri / Security Tips:
+1. Güçlü şifreler kullanın / Use strong passwords
+2. Düzenli güncellemeleri yapın / Regular updates
+3. SSL sertifikası kurun / Install SSL certificate
+4. Güvenlik duvarını yapılandırın / Configure firewall
+5. Dosya izinlerini kontrol edin / Check file permissions
+
+SSL Sertifikası Kurulumu / SSL Certificate:
+```bash
+# Let's Encrypt kurulumu
+sudo apt install certbot python3-certbot-apache
+
+# Sertifika alma
+sudo certbot --apache
+```
+
+Virtual Host Oluşturma / Creating Virtual Host:
+```bash
+# Yapılandırma dosyası oluşturma
+sudo nano /etc/apache2/sites-available/site.conf
+
+# Virtual host aktif etme
+sudo a2ensite site.conf
+sudo systemctl reload apache2
+```
+
+Hata Ayıklama / Troubleshooting:
+1. Apache error logs kontrol
+2. PHP error logs kontrol
+3. MySQL error logs kontrol
+4. İzinlerin doğruluğunu kontrol
+5. Modüllerin aktif olduğunu kontrol
+
+Not / Note:
+- Her kurulumdan sonra servisleri yeniden başlatın
+- Güvenlik güncellemelerini düzenli takip edin
+- Yedekleme rutini oluşturun
+- Performans optimizasyonu yapın
