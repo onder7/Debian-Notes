@@ -249,3 +249,57 @@ Ayarlar > Kısayolları Yapılandır
 ```
 
 Bu yöntemlerden size en uygun olanı kullanabilirsiniz. 
+
+``````
+The system will suspend now!
+``````
+Bu mesaj sistemin askıya alınacağını (suspend/uyku moduna geçeceğini) belirten bir uyarıdır. İşte bu durumla ilgili bilmeniz gerekenler ve yapabilecekleriniz:
+
+1. Sistemin Askıya Alınmasını Engellemek İçin:
+```bash
+# Askıya almayı iptal etmek için
+sudo systemctl cancel-shutdown
+
+# veya
+sudo shutdown -c
+```
+
+2. Açık Dosyaları Kaydetme:
+- Tüm açık belgelerinizi kaydedin
+- Çalışan programları düzgünce kapatın
+- Devam eden indirmeleri durdurun
+
+3. Sistem Durumunu Kontrol:
+```bash
+# Sistemi kullanan kullanıcıları görmek için
+who
+
+# Çalışan işlemleri görmek için
+ps aux
+
+# Sistem kaynaklarını kontrol etmek için
+top
+```
+
+4. Askıya Alma İşlemini Yönetme:
+```bash
+# Manuel askıya alma
+sudo pm-suspend
+
+# Veya
+sudo systemctl suspend
+```
+
+5. Zamanlı Askıya Alma:
+```bash
+# 30 dakika sonra askıya alma
+sudo shutdown -h +30
+
+# Belirli bir saatte askıya alma
+sudo shutdown -h 23:00
+```
+
+Önemli Notlar:
+- Açık dosyalarınızı kaydettiğinizden emin olun
+- Önemli işlemlerin tamamlandığından emin olun
+- Sistem yeniden başlatıldığında işlerinize kaldığınız yerden devam edebilirsiniz
