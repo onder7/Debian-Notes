@@ -44,6 +44,7 @@ Debian install Notes..
 5. LAMP install
    
 6. OpenSSH install
+7. Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
 *****************************************************
    
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
@@ -822,3 +823,88 @@ ssh -V
 # SSH anahtar parmak izi
 ssh-keygen -l -f ~/.ssh/id_rsa.pub
 ```
+Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
+
+1. Manuel Saat/Tarih Ayarlama / Manual Date/Time Setting:
+```bash
+# Tarih ve saat ayarlama
+sudo date --set="2024-11-24 14:30:00"
+
+# Sadece saat ayarlama
+sudo date +%T -s "14:30:00"
+
+# Sadece tarih ayarlama
+sudo date +%Y%m%d -s "20241124"
+```
+
+2. NTP (Network Time Protocol) ile Otomatik Ayarlama:
+```bash
+# NTP kurulumu
+sudo apt update
+sudo apt install ntp
+
+# NTP servisi başlatma
+sudo systemctl start ntp
+sudo systemctl enable ntp
+
+# NTP durumu kontrolü
+sudo systemctl status ntp
+```
+
+3. Zaman Dilimi Ayarları / Timezone Settings:
+```bash
+# Mevcut zaman dilimini görme
+timedatectl
+
+# Kullanılabilir zaman dilimlerini listeleme
+timedatectl list-timezones
+
+# Zaman dilimini değiştirme
+sudo timedatectl set-timezone Europe/Istanbul
+```
+
+4. Donanım Saati Senkronizasyonu:
+```bash
+# Sistem saatini donanım saatine yazma
+sudo hwclock --systohc
+
+# Donanım saatini okuma
+sudo hwclock --show
+
+# Donanım saatini ayarlama
+sudo hwclock --set --date="2024-11-24 14:30:00"
+```
+
+5. Chrony ile Saat Senkronizasyonu:
+```bash
+# Chrony kurulumu
+sudo apt install chrony
+
+# Servisi başlatma
+sudo systemctl start chronyd
+sudo systemctl enable chronyd
+
+# Durum kontrolü
+chronyc tracking
+```
+
+Yararlı Komutlar / Useful Commands:
+```bash
+# Mevcut saat ve tarihi gösterme
+date
+
+# NTP sunucuları ile senkronizasyon durumu
+ntpq -p
+
+# Sistem saati ayarlarını görme
+timedatectl status
+
+# Zaman senkronizasyonunu kontrol etme
+sudo timedatectl set-ntp true
+```
+
+Not / Notes:
+- Sunucu sistemlerinde NTP kullanımı önerilir
+- Zaman dilimi değişikliklerinde sistemin yeniden başlatılması gerekebilir
+- Saat değişikliği bazı servisleri etkileyebilir
+- Donanım saati UTC formatında tutulur
