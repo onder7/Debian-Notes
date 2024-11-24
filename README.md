@@ -1,4 +1,46 @@
-Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
+Debian install Notes..
+
+1. Debian Repository Ekleme / Adding Debian Repository
+   - Sources.list Dosyası Ekleme / Adding Sources.list File
+   - Temel Repository Formatı / Basic Repository Format
+   - Resmi Repository'ler / Official Repositories
+   - GPG Anahtarı Ekleme / Adding GPG Key
+   - Repository Güncelleme / Repository Update
+   - Backports Repository / Backports Repository
+   - Third-Party Repository / Third-Party Repository
+   - Repository Silme / Remove Repository
+   - Repository Yönetimi / Repository Management
+   - HTTPS Desteği / HTTPS Support
+
+2. Terminal Kopyalama-Yapıştırma / Terminal Copy-Paste
+   - Terminal İçi Kopyalama / In-Terminal Copy
+   - Sağ Tık Menüsü / Right Click Menu
+   - Orta Fare Tuşu / Middle Mouse Button
+   - Terminal Kısayolları / Terminal Shortcuts
+   - Screen Kullanımı / Screen Usage
+   - Tmux Kullanımı / Tmux Usage
+   - Buffer Kopyalama / Buffer Copy
+   - xclip Kullanımı / xclip Usage
+   - Terminal Yapılandırması / Terminal Configuration
+   - Vim Kopyalama / Vim Copy
+   - SSH Kopyalama / SSH Copy
+
+3. Sistem Askıya Alma / System Suspend
+   - Askıya Alma Engelleme / Prevent Suspend
+   - Dosya Kaydetme / Save Files
+   - Sistem Durumu Kontrolü / System Status Check
+   - Askıya Alma Yönetimi / Suspend Management
+   - Zamanlı Askıya Alma / Timed Suspend
+
+4. RDP Kurulumu / RDP Setup
+   - XRDP Kurulumu / XRDP Installation
+   - XRDP Servis Yönetimi / XRDP Service Management
+   - Firewall Ayarları / Firewall Settings
+   - Masaüstü Ortamı Ayarları / Desktop Environment Settings
+   - Sorun Giderme / Troubleshooting
+   - Güvenlik Önerileri / Security Recommendations
+   - Bağlantı Bilgileri / Connection Information
+
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
 
 1. Sources.list Dosyası Üzerinden Ekleme:
