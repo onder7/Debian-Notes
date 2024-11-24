@@ -303,3 +303,179 @@ sudo shutdown -h 23:00
 - Açık dosyalarınızı kaydettiğinizden emin olun
 - Önemli işlemlerin tamamlandığından emin olun
 - Sistem yeniden başlatıldığında işlerinize kaldığınız yerden devam edebilirsiniz
+
+  Debian'da RDP (Remote Desktop Protocol) kurulumu için adım adım rehber:
+
+**TÜRKÇE:**
+
+1. **XRDP Kurulumu:**
+```bash
+# Sistem güncellemesi
+sudo apt update
+sudo apt upgrade -y
+
+# XRDP ve XFCE4 masaüstü ortamı kurulumu
+sudo apt install xrdp xfce4 xfce4-goodies -y
+```
+
+2. **XRDP Servisini Başlatma:**
+```bash
+# XRDP servisini başlat
+sudo systemctl start xrdp
+
+# Sistem başlangıcında otomatik başlatma
+sudo systemctl enable xrdp
+```
+
+3. **Firewall Ayarları:**
+```bash
+# UFW ile port açma
+sudo ufw allow 3389/tcp
+
+# Firewall'u yeniden başlat
+sudo ufw reload
+```
+
+4. **Masaüstü Ortamını Ayarlama:**
+```bash
+# XFCE4 yapılandırma dosyası oluşturma
+echo xfce4-session > ~/.xsession
+
+# XRDP yapılandırma dosyasını düzenleme
+sudo nano /etc/xrdp/startwm.sh
+```
+
+Dosyanın sonuna ekleyin:
+```bash
+#!/bin/sh
+unset DBUS_SESSION_BUS_ADDRESS
+unset XDG_RUNTIME_DIR
+startxfce4
+```
+
+5. **Servisi Yeniden Başlatma:**
+```bash
+sudo systemctl restart xrdp
+```
+
+6. **Bağlantı Durumunu Kontrol Etme:**
+```bash
+sudo systemctl status xrdp
+```
+
+**ENGLISH:**
+
+1. **Installing XRDP:**
+```bash
+# System update
+sudo apt update
+sudo apt upgrade -y
+
+# Install XRDP and XFCE4 desktop environment
+sudo apt install xrdp xfce4 xfce4-goodies -y
+```
+
+2. **Starting XRDP Service:**
+```bash
+# Start XRDP service
+sudo systemctl start xrdp
+
+# Enable automatic start at boot
+sudo systemctl enable xrdp
+```
+
+3. **Firewall Settings:**
+```bash
+# Open port with UFW
+sudo ufw allow 3389/tcp
+
+# Reload firewall
+sudo ufw reload
+```
+
+4. **Setting Up Desktop Environment:**
+```bash
+# Create XFCE4 configuration file
+echo xfce4-session > ~/.xsession
+
+# Edit XRDP configuration file
+sudo nano /etc/xrdp/startwm.sh
+```
+
+Add to end of file:
+```bash
+#!/bin/sh
+unset DBUS_SESSION_BUS_ADDRESS
+unset XDG_RUNTIME_DIR
+startxfce4
+```
+
+5. **Restart Service:**
+```bash
+sudo systemctl restart xrdp
+```
+
+6. **Check Connection Status:**
+```bash
+sudo systemctl status xrdp
+```
+
+**Sorun Giderme / Troubleshooting:**
+
+1. **Bağlantı Sorunları / Connection Issues:**
+```bash
+# Log kontrolü / Check logs
+sudo tail -f /var/log/xrdp.log
+
+# Servis durumu / Service status
+sudo systemctl status xrdp
+```
+
+2. **İzin Sorunları / Permission Issues:**
+```bash
+# İzinleri düzenleme / Fix permissions
+sudo chown xrdp:xrdp /var/run/xrdp.pid
+sudo chown xrdp:xrdp /var/run/xrdp.sock
+```
+
+3. **Port Kontrolü / Port Check:**
+```bash
+# Port dinleme durumu / Port listening status
+sudo netstat -tulpn | grep xrdp
+```
+
+4. **SSL Sertifika Yenileme / SSL Certificate Renewal:**
+```bash
+# Sertifikaları yenileme / Renew certificates
+sudo xrdp-keygen xrdp auto
+```
+
+**Güvenlik Önerileri / Security Recommendations:**
+
+1. **Güçlü Şifre Kullanımı / Strong Password Usage:**
+```bash
+# Şifre politikası ayarlama / Set password policy
+sudo apt install libpam-pwquality
+sudo nano /etc/security/pwquality.conf
+```
+
+2. **SSH Üzerinden Tünel / SSH Tunneling:**
+```bash
+# SSH tüneli oluşturma / Create SSH tunnel
+ssh -L 3389:localhost:3389 kullanici@sunucu-ip
+```
+
+3. **Fail2ban Kurulumu / Install Fail2ban:**
+```bash
+sudo apt install fail2ban
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+sudo nano /etc/fail2ban/jail.local
+```
+
+**Bağlantı Bilgileri / Connection Information:**
+- Varsayılan Port / Default Port: 3389
+- Protokol / Protocol: RDP
+- Kullanıcı Adı / Username: Linux kullanıcı adınız / Your Linux username
+- Şifre / Password: Linux kullanıcı şifreniz / Your Linux password
+
+Windows'tan bağlanmak için "Uzak Masaüstü Bağlantısı" (Remote Desktop Connection) uygulamasını kullanabilirsiniz. / You can use Remote Desktop Connection application from Windows to connect.
