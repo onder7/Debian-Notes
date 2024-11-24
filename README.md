@@ -42,9 +42,9 @@ Debian install Notes..
    - Bağlantı Bilgileri / Connection Information
 
 5. LAMP install
-   
 6. OpenSSH install
 7. Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
+8. Debian/Linux'ta uyku moduna girmeyi engelleme yöntemleri
 *****************************************************
    
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
@@ -908,3 +908,125 @@ Not / Notes:
 - Zaman dilimi değişikliklerinde sistemin yeniden başlatılması gerekebilir
 - Saat değişikliği bazı servisleri etkileyebilir
 - Donanım saati UTC formatında tutulur
+
+Debian/Linux'ta uyku moduna girmeyi engelleme yöntemleri:
+
+1. Sistem Ayarlarından Engelleme / System Settings:
+```bash
+# Güç yönetimi ayarlarını değiştirme
+sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+
+# Servisleri kontrol etme
+systemctl status sleep.target suspend.target hibernate.target hybrid-sleep.target
+```
+
+2. Komut Satırı ile Geçici Engelleme / Temporary Prevention:
+```bash
+# systemd-inhibit kullanımı
+systemd-inhibit --what=sleep --who="$USER" --why="Prevent suspend" --mode=block sleep infinity
+
+# caffeine benzeri uygulama
+sudo apt install caffeine
+```
+
+3. Güç Yönetimi Ayarları / Power Management:
+```bash
+# GNOME için
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
+
+# KDE için
+qdbus org.kde.Solid.PowerManagement /org/kde/Solid/PowerManagement set suppressSleep true
+```
+
+4. systemd Yapılandırması / systemd Configuration:
+```bash
+# logind.conf düzenleme
+sudo nano /etc/systemd/logind.conf
+
+# Eklenecek/değiştirilecek satırlar:
+HandleLidSwitch=ignore
+HandleLidSwitchExternalPower=ignore
+IdleAction=ignore
+```
+
+5. DPMS (Ekran Güç Yönetimi) Ayarları:
+```bash
+# DPMS'i devre dışı bırakma
+xset -dpms
+xset s off
+
+# Kalıcı yapmak için ~/.xprofile'a ekleyin:
+echo "xset -dpms" >> ~/.xprofile
+echo "xset s off" >> ~/.xprofile
+```
+
+6. Otomatik Script Oluşturma / Create Automatic Script:
+```bash
+# Script oluşturma
+sudo nano /usr/local/bin/prevent-suspend.sh
+
+# Script içeriği
+#!/bin/bash
+while true; do
+    xdotool keydown Shift; xdotool keyup Shift
+    sleep 59
+done
+
+# Çalıştırılabilir yapma
+sudo chmod +x /usr/local/bin/prevent-suspend.sh
+```
+
+7. Kernel Parametreleri / Kernel Parameters:
+```bash
+# GRUB yapılandırması
+sudo nano /etc/default/grub
+
+# Eklenecek parametre
+GRUB_CMDLINE_LINUX_DEFAULT="quiet splash noacpi"
+
+# GRUB güncelleme
+sudo update-grub
+```
+
+8. Otomatik Başlangıç Ayarı / Autostart Setting:
+```bash
+# Autostart dosyası oluşturma
+mkdir -p ~/.config/autostart
+nano ~/.config/autostart/prevent-suspend.desktop
+
+# Dosya içeriği
+[Desktop Entry]
+Type=Application
+Name=Prevent Suspend
+Exec=/usr/local/bin/prevent-suspend.sh
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+```
+
+Önemli Notlar / Important Notes:
+- Bazı ayarlar masaüstü ortamına göre değişebilir
+- Sistem güncellemelerinde ayarlar sıfırlanabilir
+- Pil kullanımı artabilir
+- Güvenlik güncellemeleri için sistem yeniden başlatılmalıdır
+
+Sorun Giderme / Troubleshooting:
+```bash
+# Güç yönetimi durumu
+powerprofilesctl get
+
+# Uyku modu durumu
+systemctl status systemd-suspend.service
+
+# Aktif inhibitörleri görme
+systemd-inhibit --list
+```
+
+GUI Uygulamaları / GUI Applications:
+- Caffeine
+- GNOME Tweaks
+- KDE System Settings
+- Power Manager Settings
+
+Her masaüstü ortamı için ayarlar farklı olabilir, kullandığınız ortama göre uygun yöntemi seçin.
