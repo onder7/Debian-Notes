@@ -46,6 +46,7 @@ Debian install Notes..
 7. Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
 8. Debian/Linux'ta uyku moduna girmeyi engelleme yöntemleri
 9. FTP sunucusu kurulumu için vsftpd (Very Secure FTP Daemon) kullanacağız
+10. Debian'a VSCode kurulumunu 
 *****************************************************
    
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
@@ -1362,5 +1363,120 @@ Güvenlik notları:
 2. Düzenli olarak log dosyalarını kontrol edin
 3. Güçlü şifre kullandığınızdan emin olun
 
-Eğer bağlantı veya izin sorunları yaşarsanız, lütfen bildirin. Size yardımcı olmaya devam edeceğim.
+
+10. Debian'a VSCode kurulumunu adım adım yapalım:
+
+1. Önce gerekli bağımlılıkları yükleyelim:
+```bash
+sudo apt update
+sudo apt install software-properties-common apt-transport-https wget gpg
+```
+
+2. Microsoft GPG anahtarını indirelim ve ekleyelim:
+```bash
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+sudo install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
+```
+
+3. VSCode deposunu sisteme ekleyelim:
+```bash
+sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+```
+
+4. Paket listesini güncelleyelim:
+```bash
+sudo apt update
+```
+
+5. VSCode'u yükleyelim:
+```bash
+sudo apt install code
+```
+
+Yararlı VSCode Eklentileri (isteğe bağlı):
+
+Python Geliştirme için:
+```
+- Python (Microsoft)
+- Pylance
+- Python Indent
+- autoDocstring
+```
+
+Web Geliştirme için:
+```
+- Live Server
+- HTML CSS Support
+- JavaScript (ES6) code snippets
+- ESLint
+```
+
+PHP Geliştirme için:
+```
+- PHP Intelephense
+- PHP Debug
+- PHP Extension Pack
+```
+
+Git için:
+```
+- GitLens
+- Git History
+```
+
+Genel Kullanım için:
+```
+- Material Icon Theme
+- One Dark Pro
+- Remote - SSH
+- Remote Development
+```
+
+VSCode Temel Ayarları:
+
+1. Otomatik kaydetme:
+File > Preferences > Settings
+- "Files: Auto Save" seçeneğini "afterDelay" yapın
+
+2. Yazı tipi boyutu:
+File > Preferences > Settings
+- "Editor: Font Size" değerini istediğiniz boyuta ayarlayın
+
+3. Tema değiştirme:
+File > Preferences > Color Theme
+- İstediğiniz temayı seçin
+
+4. Terminal entegrasyonu:
+```
+Ctrl + ` (backtick) ile terminali açabilirsiniz
+```
+
+Temel VSCode Kısayolları:
+```
+Ctrl + P : Dosya arama
+Ctrl + Shift + P : Komut paleti
+Ctrl + , : Ayarlar
+Ctrl + B : Kenar çubuğunu gizle/göster
+Ctrl + ` : Terminal aç/kapa
+Ctrl + / : Satır yorumu
+Alt + Up/Down : Satırı yukarı/aşağı taşı
+Ctrl + D : Sonraki eşleşmeyi seç
+```
+
+Proje Dizini Açma:
+1. VSCode'u başlatın
+2. File > Open Folder
+3. Proje dizininizi seçin
+
+VSCode'u güncellemek için:
+```bash
+sudo apt update
+sudo apt upgrade code
+```
+
+VSCode'u kaldırmak için:
+```bash
+sudo apt remove code
+sudo apt autoremove
+```
 
