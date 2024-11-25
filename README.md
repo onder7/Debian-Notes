@@ -41,7 +41,7 @@ Debian install Notes..
    - Güvenlik Önerileri / Security Recommendations
    - Bağlantı Bilgileri / Connection Information
 
-5. LAMP install
+5. LAMP install (phpmayadmin + secure install)
 6. OpenSSH install
 7. Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
 8. Debian/Linux'ta uyku moduna girmeyi engelleme yöntemleri
