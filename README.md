@@ -45,6 +45,7 @@ Debian install Notes..
 6. OpenSSH install
 7. Debian/Linux sisteminde saat ve tarih güncelleme işlemleri
 8. Debian/Linux'ta uyku moduna girmeyi engelleme yöntemleri
+9. FTP sunucusu kurulumu için vsftpd (Very Secure FTP Daemon) kullanacağız
 *****************************************************
    
 Debian'da repository (depo) ekleme konusunda size yardımcı olacağım. İşte farklı yöntemlerle repository ekleme adımları:
@@ -602,14 +603,148 @@ sudo ufw allow 443/tcp
 sudo ufw reload
 ```
 
-8. PhpMyAdmin Kurulumu (Opsiyonel) / PhpMyAdmin Installation:
-```bash
-# PhpMyAdmin kurulumu
-sudo apt install phpmyadmin
+8. PhpMyAdmin Kurulumu (Opsiyonel) / PhpMyAdmin Installation /phpMyAdmin secure Installation adım adım yapalım:
 
-# Apache yapılandırması
-sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+1. İlk olarak paket deposunu güncelleyelim:
+```bash
+sudo apt update
 ```
+
+2. phpMyAdmin ve gerekli PHP paketlerini kuralım:
+```bash
+sudo apt install phpmyadmin php-mbstring php-zip php-gd php-json php-curl
+```
+
+Kurulum sırasında şu adımlarla karşılaşacaksınız:
+
+- Web sunucusu seçimi penceresi geldiğinde:
+  - Apache2 kullanıyorsanız [*] Apache2'yi seçin (Space tuşu ile seçim yapılır)
+  - Tab tuşu ile OK'a gelip Enter'a basın
+
+- "Configuring phpmyadmin" ekranında:
+  - "Yes" seçeneğini seçin ve phpMyAdmin veritabanını otomatik yapılandırmasına izin verin
+
+- Veritabanı yapılandırması için bir şifre belirlemeniz istenecek:
+  - Güvenli bir şifre belirleyin ve not alın
+  - Şifreyi tekrar girin
+
+3. PHP'yi yeniden başlatalım:
+```bash
+sudo systemctl restart apache2
+```
+
+4. Güvenlik için Apache'de phpMyAdmin konfigürasyonunu düzenleyelim:
+```bash
+sudo nano /etc/apache2/conf-available/phpmyadmin.conf
+```
+
+Bu dosyaya şu satırları ekleyin (veya düzenleyin):
+```apache
+<Directory /usr/share/phpmyadmin>
+    Options FollowSymLinks
+    DirectoryIndex index.php
+    AllowOverride All
+    
+    <IfModule mod_php.c>
+        php_flag magic_quotes_gpc Off
+        php_flag track_vars On
+        php_flag register_globals Off
+        php_value include_path .
+    </IfModule>
+    
+    # Limit access to localhost only
+    Require local
+</Directory>
+```
+
+5. Apache'yi yeniden başlatalım:
+```bash
+sudo systemctl restart apache2
+```
+
+Artık phpMyAdmin'e erişebilirsiniz:
+- Web tarayıcınızda şu adresi açın: `http://localhost/phpmyadmin` veya `http://sunucu-ip-adresi/phpmyadmin`
+- Kullanıcı adı olarak "root"
+- Şifre olarak MySQL root şifrenizi kullanın
+
+///////////////phpmayadmin//////////////
+
+************gerekirsese yeniden yapılandırma************
+
+Tamam, phpMyAdmin'i yeniden yapılandıralım:
+
+1. Önce yeniden yapılandırma komutunu çalıştıralım:
+```bash
+sudo dpkg-reconfigure phpmyadmin
+```
+
+Bu komuttan sonra karşınıza aşağıdaki adımlar çıkacak:
+
+2. Yapılandırma Adımları:
+   - Web sunucusu seçimi ekranında:
+     - [*] Apache2'yi seçin (Space tuşu ile)
+     - Tab tuşu ile OK'a gelip Enter'a basın
+
+   - "Configure database for phpmyadmin with dbconfig-common?" sorusuna:
+     - "Yes" seçeneğini seçin
+
+   - phpMyAdmin veritabanı için şifre belirleme:
+     - Güvenli bir şifre girin (örneğin: şifreniz)
+     - Şifreyi tekrar girin
+
+3. Yapılandırma tamamlandıktan sonra, gerekli servisleri yeniden başlatalım:
+```bash
+sudo systemctl restart mysql
+sudo systemctl restart apache2
+```
+
+4. İzinleri kontrol edelim:
+```bash
+sudo chown -R www-data:www-data /etc/phpmyadmin/
+sudo chmod 644 /etc/phpmyadmin/config.inc.php
+```
+
+5. MySQL'de root kullanıcısının yetkilendirmesini yapalım:
+```bash
+sudo mysql
+```
+
+MySQL komut satırında:
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'şifre';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+6. Son olarak, tüm ayarların doğru çalıştığından emin olmak için tekrar servisleri yeniden başlatalım:
+```bash
+sudo systemctl restart mysql
+sudo systemctl restart apache2
+```
+
+Şimdi web tarayıcınızdan phpMyAdmin'e erişmeyi deneyin:
+```
+http://localhost/phpmyadmin
+```
+veya
+```
+http://sunucu-ip-adresi/phpmyadmin
+```
+
+Kullanıcı adı: root
+Şifre: şifre
+
+Eğer hala bir sorunla karşılaşırsanız, lütfen hatayı paylaşın. Size yardımcı olmaya devam edeceğim.
+
+*********************************************************
+
+
+Güvenlik İpuçları:
+1. phpMyAdmin dizinini yeniden adlandırabilirsiniz
+2. .htaccess ile ek güvenlik katmanı ekleyebilirsiniz
+3. Erişimi belirli IP adreslerine kısıtlayabilirsiniz
+
+
 
 Önemli Dizinler / Important Directories:
 ```bash
@@ -1030,3 +1165,202 @@ GUI Uygulamaları / GUI Applications:
 - Power Manager Settings
 
 Her masaüstü ortamı için ayarlar farklı olabilir, kullandığınız ortama göre uygun yöntemi seçin.
+
+9. FTP sunucusu kurmak için vsftpd (Very Secure FTP Daemon) kullanacağız. Adım adım kuralım:
+
+1. Önce vsftpd'yi yükleyelim:
+```bash
+sudo apt update
+sudo apt install vsftpd
+```
+
+2. Orijinal config dosyasını yedekleyelim:
+```bash
+sudo cp /etc/vsftpd.conf /etc/vsftpd.conf.backup
+```
+
+3. vsftpd.conf dosyasını düzenleyelim:
+```bash
+sudo nano /etc/vsftpd.conf
+```
+
+vsftpd.conf içeriğini şu şekilde düzenleyelim:
+```conf
+# Temel Ayarlar
+listen=YES
+listen_ipv6=NO
+anonymous_enable=NO
+local_enable=YES
+write_enable=YES
+local_umask=022
+dirmessage_enable=YES
+use_localtime=YES
+
+# Güvenlik Ayarları
+chroot_local_user=YES
+allow_writeable_chroot=YES
+ssl_enable=NO
+pasv_enable=YES
+pasv_min_port=40000
+pasv_max_port=40100
+
+# Logging
+xferlog_enable=YES
+xferlog_file=/var/log/vsftpd.log
+xferlog_std_format=YES
+
+# www klasörü için özel ayarlar
+local_root=/var/www
+user_sub_token=$USER
+```
+
+4. FTP için yeni bir kullanıcı oluşturalım:
+```bash
+sudo adduser ftpuser
+```
+(Sizden şifre ve kullanıcı bilgileri isteyecek, bunları doldurun)
+
+5. Kullanıcıyı www-data grubuna ekleyelim:
+```bash
+sudo usermod -aG www-data ftpuser
+```
+
+6. www dizini için izinleri düzenleyelim:
+```bash
+sudo chown -R www-data:www-data /var/www
+sudo chmod -R 775 /var/www
+```
+
+7. vsftpd servisini yeniden başlatalım:
+```bash
+sudo systemctl restart vsftpd
+```
+
+8. Firewall ayarlarını yapalım (eğer UFW kullanıyorsanız):
+```bash
+sudo ufw allow 20/tcp
+sudo ufw allow 21/tcp
+sudo ufw allow 40000:40100/tcp
+sudo ufw enable
+```
+
+Artık FTP sunucunuz hazır! Şu bilgilerle bağlanabilirsiniz:
+- Host: sunucu-ip-adresi
+- Port: 21
+- Kullanıcı adı: ftpuser
+- Şifre: (oluşturduğunuz şifre)
+
+FTP istemcisi olarak şunları kullanabilirsiniz:
+- FileZilla
+- WinSCP (Windows için)
+- Cyberduck (Mac için)
+
+Güvenlik İpuçları:
+1. Güçlü şifreler kullanın
+2. Mümkünse SFTP kullanın (daha güvenli)
+3. Sadece gerekli dizinlere erişim verin
+4. Düzenli olarak log dosyalarını kontrol edin
+
+Örnek bir kullanıcı ve klasör erişimi için; kök dizinideki python klasörüne özel bir kullanıcı erişimi yapacağız.
+
+Python klasörüne erişim için yeni bir FTP kullanıcısı oluşturalım:
+
+1. Yeni bir kullanıcı oluşturalım:
+```bash
+sudo adduser pythonuser
+```
+(Şifre ve kullanıcı bilgilerini doldurun)
+
+2. Python klasörünüz için (örneğin /python) dizin oluşturalım:
+```bash
+sudo mkdir /python
+```
+
+3. Klasör sahipliği ve izinlerini ayarlayalım:
+```bash
+sudo chown -R pythonuser:pythonuser /python
+sudo chmod -R 755 /python
+```
+
+4. vsftpd.conf dosyasını düzenleyelim:
+```bash
+sudo nano /etc/vsftpd.conf
+```
+
+Dosyaya şu satırları ekleyelim (eğer yoksa):
+```conf
+# Kullanıcı bazlı dizin yapılandırması
+user_sub_token=$USER
+local_root=/home/$USER
+
+# Güvenlik ayarları
+chroot_local_user=YES
+allow_writeable_chroot=YES
+write_enable=YES
+
+# Kullanıcı listesi ayarları
+userlist_enable=YES
+userlist_file=/etc/vsftpd.userlist
+userlist_deny=NO
+```
+
+5. Kullanıcı listesi oluşturalım:
+```bash
+sudo nano /etc/vsftpd.userlist
+```
+
+Bu dosyaya kullanıcıları ekleyelim:
+```
+ftpuser
+pythonuser
+```
+
+6. Python kullanıcısı için özel bir yapılandırma dosyası oluşturalım:
+```bash
+sudo mkdir -p /etc/vsftpd/users
+sudo nano /etc/vsftpd/users/pythonuser
+```
+
+İçeriği şu şekilde olsun:
+```
+local_root=/python
+```
+
+7. Ana vsftpd.conf dosyasına bu kullanıcı yapılandırmasını ekleyelim:
+```bash
+sudo nano /etc/vsftpd.conf
+```
+
+Dosyanın sonuna ekleyin:
+```conf
+user_config_dir=/etc/vsftpd/users
+```
+
+8. Servisi yeniden başlatalım:
+```bash
+sudo systemctl restart vsftpd
+```
+
+9. İzinleri test edelim:
+```bash
+sudo -u pythonuser touch /python/test.txt
+```
+
+Artık şu bilgilerle bağlanabilirsiniz:
+- Host: sunucu-ip-adresi
+- Port: 21
+- Kullanıcı adı: pythonuser
+- Şifre: (oluşturduğunuz şifre)
+
+Test etmek için:
+1. FileZilla veya başka bir FTP istemcisi kullanın
+2. Yukarıdaki bilgilerle bağlanın
+3. /python dizinine dosya yüklemeyi deneyin
+
+Güvenlik notları:
+1. Python klasöründe çalıştırılabilir dosyalar için dikkatli olun
+2. Düzenli olarak log dosyalarını kontrol edin
+3. Güçlü şifre kullandığınızdan emin olun
+
+Eğer bağlantı veya izin sorunları yaşarsanız, lütfen bildirin. Size yardımcı olmaya devam edeceğim.
+
